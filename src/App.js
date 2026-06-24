@@ -1,24 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Login from './pages/user-login/Login';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {ProtectedRoute, PublicRoute} from './Protected';
+import HomePage from './components/HomePage';
+import UserDetails from './components/UserDetails';
+import Status from './pages/StatusSection/Status'
+import Setting from './pages/SettingSection/Setting'
+import UserStore from './store/useUserStore';
+import { disconnectSocket, initializeSocket } from './services/chat.service';
+import { useChatStore } from './store/chatStore';
+
 
 function App() {
+
+  const {user} = UserStore();  
+  const {setCurrentUser, initsocketListners, cleanup} = useChatStore();
+  
+  useEffect(() => {
+    if(user?._id){
+      const socket = initializeSocket();
+
+      if(socket){
+        setCurrentUser(user);
+
+        initsocketListners();
+      }
+    }
+    return () => {
+      cleanup();
+      disconnectSocket();
+    }
+  }, [user, setCurrentUser, initializeSocket, cleanup])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ToastContainer position='top-right' autoClose={3000} />
+      <Router>
+        <Routes>
+          <Route element={<PublicRoute/>}>
+            <Route path='/user-login' element={<Login />} />
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path='/' element={<HomePage />}/>
+            <Route path='/user-profile' element={<UserDetails />}/>
+            <Route path='/status' element={<Status />}/>
+            <Route path='/setting' element={<Setting />}/>
+          </Route>
+        </Routes>
+      </Router>
+    </>
   );
 }
 
