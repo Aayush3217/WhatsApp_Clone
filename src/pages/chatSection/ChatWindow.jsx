@@ -190,11 +190,33 @@ const ChatWindow = ({ selectedContact, setSelectedContact, isMobile }) => {
         >
           <FaArrowLeft className='h-6 w-6' />
         </button>
-        <img src={selectedContact?.profilePicture} alt={selectedContact?.username} className='w-10 h-10 rounded-full' />
+        {/* <img src={selectedContact?.profilePicture} alt={selectedContact?.username} className='w-10 h-10 rounded-full' /> */}
+        <img
+          src={
+            selectedContact?.profilePicture ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              selectedContact?.username ||
+              selectedContact?.phoneNumber ||
+              selectedContact?.email ||
+              "User"
+            )}`
+          }
+          alt={
+            selectedContact?.username ||
+            selectedContact?.phoneNumber ||
+            selectedContact?.email
+          }
+          className="w-10 h-10 rounded-full"
+        />
 
         <div className='ml-3 flex-grow'>
-          <h2 className='font-semibold text-start'>
+          {/* <h2 className='font-semibold text-start'>
             {selectedContact?.username}
+          </h2> */}
+          <h2 className="font-semibold text-start">
+            {selectedContact?.username ||
+              selectedContact?.phoneNumber ||
+              selectedContact?.email}
           </h2>
 
           {isTyping ? (
@@ -300,21 +322,21 @@ const ChatWindow = ({ selectedContact, setSelectedContact, isMobile }) => {
           )}
         </div>
 
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={(e) => {
-            if(e.key === "Enter"){
+            if (e.key === "Enter") {
               handleSendMessage();
             }
           }}
           placeholder='Type a message'
-          className={`flex-grow px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 ${theme==='dark' ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
+          className={`flex-grow px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 ${theme === 'dark' ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
         />
 
         <button onClick={handleSendMessage} className='focus:outline-none'>
-          <FaPaperPlane className='h-6 w-6 text-green-500'/>
+          <FaPaperPlane className='h-6 w-6 text-green-500' />
         </button>
 
       </div>
