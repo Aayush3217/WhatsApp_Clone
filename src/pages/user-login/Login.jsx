@@ -105,12 +105,16 @@ const Login = () => {
             setLoading(true);
             if (email) {
                 const response = await sendOtp(null, null, email);
-                if (response.status === 'success') {
-                    toast.info("OTP is send to your email")
+
+                if (response.status === "success") {
+                    toast.success("OTP sent to your email");
+
                     setUserPhoneData({ email });
+
                     setStep(2);
                 }
-            } else {
+            }
+            else {
                 const response = await sendOtp(phoneNumber, selectedCountry.dialCode);
                 if (response.status === 'success') {
                     toast.info("OTP is send to your Phone Number")
@@ -139,18 +143,16 @@ const Login = () => {
             } else {
                 response = await verifyOtp(userPhoneData.phoneNumber, userPhoneData.phoneSuffix, otpString);
             }
-
-            if (response.status === 'success') {
+            if (response.status === "success") {
                 toast.success("OTP verified successfully");
-                const user = response.data?.user;
-                setUser(user);
-                // console.log(UserStore.getState());
-                // console.log(typeof setUser);
-                // console.log(setUser);
-                if (user?.username && user?.profilePicture) {
-                    toast.success("Welcome back to WhatsApp");
-                    navigate("/");
+
+                const user = response.data.user;
+
+                if (user.username && user.profilePicture) {
+                    setUser(user);
+                    toast.success("Welcome back");
                     resetLoginState();
+                    navigate("/");
                 } else {
                     setStep(3);
                 }
@@ -183,10 +185,17 @@ const Login = () => {
                 formData.append("profilePicture", selectedAvatar);
             }
 
-            await updateUserProfile(formData);
-            toast.success("Welcome back to WhatsApp");
-            navigate('/');
-            resetLoginState();
+            const result = await updateUserProfile(formData);
+
+            if (result.status === "success") {
+                setUser(result.data);
+
+                toast.success("Profile created successfully");
+
+                resetLoginState();
+
+                navigate("/");
+            }
         } catch (error) {
             console.log(error);
             setError(error.message || "Failed to update user profile");
