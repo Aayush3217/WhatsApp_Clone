@@ -190,8 +190,8 @@ const ChatWindow = ({ selectedContact, setSelectedContact, isMobile }) => {
         >
           <FaArrowLeft className='h-6 w-6' />
         </button>
-        {/* <img src={selectedContact?.profilePicture} alt={selectedContact?.username} className='w-10 h-10 rounded-full' /> */}
-        <img
+        <img src={selectedContact?.profilePicture} alt={selectedContact?.username} className='w-10 h-10 rounded-full' />
+        {/* <img
           src={
             selectedContact?.profilePicture ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -207,17 +207,17 @@ const ChatWindow = ({ selectedContact, setSelectedContact, isMobile }) => {
             selectedContact?.email
           }
           className="w-10 h-10 rounded-full"
-        />
+        /> */}
 
         <div className='ml-3 flex-grow'>
-          {/* <h2 className='font-semibold text-start'>
+          <h2 className='font-semibold text-start'>
             {selectedContact?.username}
-          </h2> */}
-          <h2 className="font-semibold text-start">
+          </h2>
+          {/* <h2 className="font-semibold text-start">
             {selectedContact?.username ||
               selectedContact?.phoneNumber ||
               selectedContact?.email}
-          </h2>
+          </h2> */}
 
           {isTyping ? (
             <div>Typing...</div>
