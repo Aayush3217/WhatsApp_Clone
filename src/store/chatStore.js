@@ -28,7 +28,8 @@ export const useChatStore = create((set, get) => ({
 
         // listen for incoming messages
         socket.on("receive_message", (message) => {
-
+            console.log("Realtime message:", message);
+            get().receiveMessage(message);
         });
 
         //conform message delivery
@@ -266,7 +267,7 @@ export const useChatStore = create((set, get) => ({
 
         // update conversatio preview and unread count
         set((state) => {
-            const updateConversation = state.conversation?.data?.map((conv) => {
+            const updateConversation = state.conversations?.data?.map((conv) => {
                 if (conv._id === message.conversation) {
                     return {
                         ...conv,
@@ -279,7 +280,7 @@ export const useChatStore = create((set, get) => ({
                 return conv;
             });
             return {
-                conversation: {
+                conversations: {
                     ...state.conversations,
                     data: updateConversation
                 },
@@ -292,7 +293,7 @@ export const useChatStore = create((set, get) => ({
         const { messages, currentUser } = get();
 
         if (!messages.length || !currentUser) return;
-        const unreadIds = messages.filter((msg) => msg.messageStatus !== 'read' && msg.receiver?._id === currentUser?.id).map((msg) => msg._id).filter(Boolean)
+        const unreadIds = messages.filter((msg) => msg.messageStatus !== 'read' && msg.receiver?._id === currentUser?._id).map((msg) => msg._id).filter(Boolean)
 
         if (unreadIds.length === 0) return;
 
@@ -324,7 +325,9 @@ export const useChatStore = create((set, get) => ({
             await axiosInstance.delete(`/chats/messages/${messageId}`);
 
             set((state) => ({
-                messages: state.message?.filter((msg) => msg?._id !== messageId)
+                messages: state.messages.filter(
+                    msg => msg._id !== messageId
+                )
             }))
             return true;
         } catch (error) {
