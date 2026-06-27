@@ -246,46 +246,98 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
+    // receiveMessage: (message) => {
+    //     if (!message) return;
+
+    //     const { currentConversation, currentUser, messages } = get();
+
+    //     const messageExits = messages.some((msg) => msg._id === message._id)
+    //     if (messageExits) return;
+
+    //     if (message.conversation === currentConversation) {
+    //         set((state) => ({
+    //             messages: [...state.messages, message]
+    //         }));
+
+    //         // automatically mark as read
+    //         if (message.receiver?._id === currentUser?._id) {
+    //             get().markMessgesAsRead();
+    //         }
+    //     }
+
+    //     // update conversatio preview and unread count
+    //     set((state) => {
+    //         const updateConversation = state.conversations?.data?.map((conv) => {
+    //             if (conv._id === message.conversation) {
+    //                 return {
+    //                     ...conv,
+    //                     lastMessage: message,
+    //                     unreadCount: message?.receiver?._id === currentUser?._id
+    //                         ? (conv.unreadCount || 0) + 1
+    //                         : conv.unreadCount || 0
+    //                 }
+    //             }
+    //             return conv;
+    //         });
+    //         return {
+    //             conversations: {
+    //                 ...state.conversations,
+    //                 data: updateConversation
+    //             },
+    //         }
+    //     })
+    // },
+
     receiveMessage: (message) => {
         if (!message) return;
 
-        const { currentConversation, currentUser, messages } = get();
+        const { currentConversation, currentUser } = get();
 
-        const messageExits = messages.some((msg) => msg._id === message._id)
-        if (messageExits) return;
-
-        if (message.conversation === currentConversation) {
-            set((state) => ({
-                messages: [...state.messages, message]
-            }));
-
-            // automatically mark as read
-            if (message.receiver?._id === currentUser?._id) {
-                get().markMessgesAsRead();
-            }
-        }
-
-        // update conversatio preview and unread count
         set((state) => {
-            const updateConversation = state.conversations?.data?.map((conv) => {
-                if (conv._id === message.conversation) {
-                    return {
-                        ...conv,
-                        lastMessage: message,
-                        unreadCount: message?.receiver?._id === currentUser?._id
-                            ? (conv.unreadCount || 0) + 1
-                            : conv.unreadCount || 0
-                    }
-                }
-                return conv;
-            });
+            // Don't add duplicate messages
+            const exists = state.messages.some(
+                (msg) => msg._id === message._id
+            );
+
+            if (exists) return state;
+
+            // Only add to current chat if this conversation is open
+            const updatedMessages =
+                message.conversation === currentConversation
+                    ? [...state.messages, message]
+                    : state.messages;
+
+            // Update conversation list
+            const updatedConversations = {
+                ...state.conversations,
+                data:
+                    state.conversations?.data?.map((conv) => {
+                        if (conv._id !== message.conversation) return conv;
+
+                        return {
+                            ...conv,
+                            lastMessage: message,
+                            unreadCount:
+                                message.receiver?._id === currentUser?._id
+                                    ? (conv.unreadCount || 0) + 1
+                                    : conv.unreadCount || 0,
+                        };
+                    }) || [],
+            };
+
             return {
-                conversations: {
-                    ...state.conversations,
-                    data: updateConversation
-                },
-            }
-        })
+                messages: updatedMessages,
+                conversations: updatedConversations,
+            };
+        });
+
+        // Automatically mark as read if this conversation is open
+        if (
+            message.conversation === currentConversation &&
+            message.receiver?._id === currentUser?._id
+        ) {
+            get().markMessgesAsRead();
+        }
     },
 
     // Mark as read
