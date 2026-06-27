@@ -217,7 +217,7 @@ export const useChatStore = create((set, get) => ({
         }));
 
         try {
-            const { data } = await axiosInstance.post("/chat/send-message", formData,
+            const { data } = await axiosInstance.post("/chats/send-message", formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
             const messageData = data.data || data;
@@ -328,7 +328,7 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
-    // Add/change reactions
+    // Add/change reactions..
     addReactions: async (messageId, emoji) => {
         const socket = getSocket();
         const { currentUser } = get();
