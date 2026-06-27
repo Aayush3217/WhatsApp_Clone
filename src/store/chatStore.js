@@ -222,6 +222,12 @@ export const useChatStore = create((set, get) => ({
             );
             const messageData = data.data || data;
 
+            const socket = getSocket();
+
+            if (socket) {
+                socket.emit("send_message", messageData);
+            }
+
             // replace optimistic message with real one
             set((state) => ({
                 messages: state.messages.map((msg) =>

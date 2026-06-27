@@ -220,9 +220,19 @@ const ChatWindow = ({ selectedContact, setSelectedContact, isMobile }) => {
         {Object.entries(groupedMessages).map(([date, msgs]) => (
           <React.Fragment key={date}>
             {renderDateSeparator(new Date(date))}
-            {msgs.filter(
+            {/* {msgs.filter(
               (msg) => msg.conversation === selectedContact?.conversation?._id
             ).map((msg) => (
+              <MessageBubble
+                key={msg._id || msg.tempId}
+                message={msg}
+                theme={theme}
+                currentUser={user}
+                onReact={handleReaction}
+                deleteMessage={deleteMessage}
+              />
+            ))} */}
+            {msgs.map((msg) => (
               <MessageBubble
                 key={msg._id || msg.tempId}
                 message={msg}
@@ -278,11 +288,18 @@ const ChatWindow = ({ selectedContact, setSelectedContact, isMobile }) => {
           </button>
           {showFileMenu && (
             <div className={`absolute bottom-full left-0 mb-2 ${theme == 'dark' ? "bg-gray-700" : "bg-white"} rounded-lg shadow-lg`}>
-              <input
+              {/* <input
                 type="file"
                 onChange={handleFileChange}
                 accept="image/*,video/*"
                 className='hidden'
+              /> */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileChange}
+                accept="image/*,video/*"
+                className="hidden"
               />
               <button
                 onClick={() => fileInputRef.current.click()}
